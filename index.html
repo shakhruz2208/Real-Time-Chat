@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Two</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0b1e;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--fg:#f2f0ff;--dim:#9f9bc9;--a:#6ef2d5;--b:#8f7bff;--me:linear-gradient(135deg,#6ef2d5,#8f7bff);color-scheme:dark;box-sizing:border-box}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:Manrope,"Trebuchet MS",sans-serif}
+body{background:radial-gradient(ellipse at 20% 0%,rgba(143,123,255,.28),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(110,242,213,.18),transparent 50%),var(--bg)}
+.scr{position:fixed;inset:0;display:none;flex-direction:column}
+.scr.on{display:flex}
+#home{align-items:center;justify-content:center;padding:24px;text-align:center}
+#home h1{font-size:clamp(48px,12vw,96px);font-weight:800;letter-spacing:-.05em;margin:0 0 6px;background:var(--me);-webkit-background-clip:text;background-clip:text;color:transparent}
+#home p{color:var(--dim);margin:0 0 26px;font-size:18px;max-width:30ch;line-height:1.45}
+.box{width:min(380px,100%);display:flex;flex-direction:column;gap:12px}
+input{font:inherit;font-size:17px;color:var(--fg);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;outline:none;width:100%;transition:border-color .2s}
+input:focus{border-color:var(--a)}
+.btn{font:inherit;font-weight:800;font-size:17px;border:0;border-radius:14px;padding:14px 18px;cursor:pointer;color:#0d0b1e;background:var(--me);transition:transform .15s,filter .2s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn.g{background:var(--card);color:var(--fg);border:1.5px solid var(--line)}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.or{color:var(--dim);font-size:14px;margin:2px 0}
+#err{color:#ff7b8d;min-height:1.3em;font-size:15px}
+#chat{padding-top:env(safe-area-inset-top,0px)}
+#hd{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+#dot{width:11px;height:11px;border-radius:50%;background:#ffb84d;box-shadow:0 0 12px #ffb84d;flex:none}
+#dot.ok{background:var(--a);box-shadow:0 0 12px var(--a)}#dot.off{background:#ff5d73;box-shadow:0 0 12px #ff5d73}
+#who{font-weight:800;font-size:18px;line-height:1.1}#sub{font-size:13px;color:var(--dim)}
+#hd .sp{flex:1}
+.ib{font:inherit;font-weight:700;font-size:14px;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer}
+#msgs{flex:1;overflow-y:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:min(78%,520px);padding:10px 14px;border-radius:18px;font-size:16.5px;line-height:1.4;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.m.me{align-self:flex-end;background:var(--me);color:#0d0b1e;border-bottom-right-radius:6px;font-weight:500}
+.m.they{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px}
+.m small{display:block;font-size:11.5px;opacity:.6;margin-top:3px;text-align:right}
+.sys{align-self:center;color:var(--dim);font-size:13.5px;padding:4px 0;text-align:center}
+#ty{height:22px;padding:0 18px;color:var(--dim);font-size:13.5px}
+#ty span{display:inline-block;animation:bl 1.1s infinite}#ty span:nth-child(2){animation-delay:.15s}#ty span:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,60%,100%{opacity:.25}30%{opacity:1}}
+#em{display:none;gap:6px;padding:6px 14px}#em.on{display:flex}
+#em button{font-size:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 8px;cursor:pointer}
+#bar{display:flex;gap:8px;align-items:flex-end;padding:8px 12px calc(env(safe-area-inset-bottom,0px) + 8px);border-top:1px solid var(--line);background:rgba(13,11,30,.7);backdrop-filter:blur(10px)}
+#bar textarea{flex:1;font:inherit;font-size:16.5px;color:var(--fg);background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:11px 15px;outline:none;resize:none;max-height:120px;line-height:1.35}
+#bar textarea:focus{border-color:var(--a)}
+#bar .btn{padding:12px 20px;border-radius:18px}
+#by{text-align:center;font-size:12.5px;color:var(--dim);padding:0 0 calc(env(safe-area-inset-bottom,0px) + 6px);background:rgba(13,11,30,.7)}
+#homeby{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);text-align:center;font-size:14px;color:var(--dim);pointer-events:none}
+</style>
+</head>
+<body>
+<section id="home" class="scr on">
+ <h1>Two</h1><p>A private chat for exactly two people. No accounts, no server storing your messages.</p>
+ <div class="box">
+  <input id="nm" placeholder="Your name" maxlength="20" autocomplete="off">
+  <button class="btn" id="mk">Create a room</button>
+  <div class="or">or join your friend</div>
+  <input id="cd" placeholder="Room code" maxlength="5" autocomplete="off" style="text-transform:uppercase;letter-spacing:.2em;text-align:center">
+  <button class="btn g" id="jn">Join</button>
+  <div id="err"></div>
+ </div>
+ <div id="homeby">Made by Shakhruz</div>
+</section>
+<section id="chat" class="scr">
+ <div id="hd"><div id="dot"></div><div><div id="who">Waiting...</div><div id="sub"></div></div><div class="sp"></div><button class="ib" id="cp">Copy invite</button><button class="ib" id="lv">Leave</button></div>
+ <div id="msgs"></div><div id="ty"></div>
+ <div id="em"></div>
+ <div id="bar"><button class="ib" id="eb" style="padding:12px 14px;font-size:20px;border-radius:18px">☺</button><textarea id="tx" rows="1" placeholder="Type a message"></textarea><button class="btn" id="sd">Send</button></div>
+ <div id="by">Made by Shakhruz</div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},PFX="shkh-two-",peer=null,conn=null,me="",they="Friend",code="",host=false,tyT=0,lastTy=0,left=false;
+// remember name, read invite from link
+try{$("nm").value=localStorage.getItem("two-name")||""}catch(e){}
+var hm=/room=([A-Za-z0-9]{5})/.exec(location.hash||"");if(hm)$("cd").value=hm[1].toUpperCase();
+function show(id){["home","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
+function err(s){$("err").textContent=s}
+function name(){var n=$("nm").value.trim();if(!n){err("Please type your name first.");$("nm").focus();return null}try{localStorage.setItem("two-name",n)}catch(e){}return n}
+function gen(){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s="";for(var i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+// audio blip
+var ac;function blip(){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;o.frequency.setValueAtTime(880,n);o.frequency.exponentialRampToValueAtTime(1320,n+.08);g.gain.setValueAtTime(.07,n);g.gain.exponentialRampToValueAtTime(.001,n+.18);o.connect(g);g.connect(ac.destination);o.start(n);o.stop(n+.2)}catch(e){}}
+// ui helpers
+function status(kind,who,sub){$("dot").className=kind||"";$("who").textContent=who;$("sub").textContent=sub||""}
+function sys(t){var d=document.createElement("div");d.className="sys";d.textContent=t;$("msgs").appendChild(d);scroll()}
+function scroll(){var m=$("msgs");m.scrollTop=m.scrollHeight}
+function tm(ts){var d=new Date(ts);return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function bubble(text,mine,ts){var d=document.createElement("div");d.className="m "+(mine?"me":"they");var s=document.createElement("span");s.textContent=text;var sm=document.createElement("small");sm.textContent=tm(ts);d.appendChild(s);d.appendChild(sm);$("msgs").appendChild(d);scroll()}
+// connection
+function wire(c){conn=c;
+ c.on("open",function(){left=false;status("ok",they,"connected");c.send({t:"hi",name:me})});
+ c.on("data",function(d){if(!d||!d.t)return;
+  if(d.t==="hi"){they=String(d.name||"Friend").slice(0,20);status("ok",they,"connected");sys(they+" is here. Say hello!");blip()}
+  else if(d.t==="msg"){$("ty").textContent="";bubble(String(d.text).slice(0,2000),false,d.ts||Date.now());blip()}
+  else if(d.t==="typing"){$("ty").innerHTML=they+" is typing <span>.</span><span>.</span><span>.</span>";clearTimeout(tyT);tyT=setTimeout(function(){$("ty").textContent=""},2500)}
+  else if(d.t==="full"){err("This room already has two people.");leave(true)}});
+ c.on("close",function(){if(left)return;status("off",they,"disconnected");sys(they+" left the chat.");conn=null;if(!host){$("sub").textContent="disconnected. Tap Leave and join again."}});
+ c.on("error",function(){status("off","Connection problem","try again")})}
+function startHost(n){me=n;host=true;code=gen();peer=new Peer(PFX+code);
+ peer.on("open",function(){show("chat");status("","Waiting for your friend","room "+code);sys("Share the invite and wait for your friend to join. Room code: "+code)});
+ peer.on("connection",function(c){if(conn&&conn.open){c.on("open",function(){c.send({t:"full"});setTimeout(function(){c.close()},300)});return}wire(c)});
+ peer.on("error",function(e){if(e.type==="unavailable-id"){peer.destroy();startHost(n)}else if(e.type==="network"||e.type==="server-error"||e.type==="socket-error"){show("home");err("Cannot reach the connection service. Check your internet.")}});}
+function startGuest(n,c){me=n;host=false;code=c;peer=new Peer();var to=setTimeout(function(){err("Could not connect. Check the code or your internet.");leave(true)},15000);
+ peer.on("open",function(){var cn=peer.connect(PFX+code,{reliable:true});cn.on("open",function(){clearTimeout(to);show("chat");status("ok","Connecting...","room "+code)});wire(cn)});
+ peer.on("error",function(e){clearTimeout(to);if(e.type==="peer-unavailable"){err("Room not found. Check the code.");leave(true)}else{err("Connection error: "+e.type);leave(true)}})}
+function leave(quiet){left=true;try{if(conn)conn.close()}catch(e){}try{if(peer)peer.destroy()}catch(e){}conn=null;peer=null;$("msgs").innerHTML="";$("ty").textContent="";show("home");if(!quiet)err("")}
+// actions
+$("mk").onclick=function(){err("");var n=name();if(n)startHost(n)};
+$("jn").onclick=function(){err("");var n=name();if(!n)return;var c=$("cd").value.trim().toUpperCase();if(c.length!==5){err("The room code has 5 characters.");return}startGuest(n,c)};
+$("lv").onclick=function(){leave()};
+$("cp").onclick=function(){var url=location.href.split("#")[0]+"#room="+code,txt="Join my chat: "+url;if(navigator.share&&/Mobi|Android/i.test(navigator.userAgent)){navigator.share({title:"Two",text:"Join my private chat",url:url}).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){sys("Invite link copied. Send it to your friend.")},function(){sys("Room code: "+code)})}else sys("Room code: "+code)};
+function send(){var tx=$("tx"),v=tx.value.trim();if(!v)return;if(!conn||!conn.open){sys("Not connected yet.");return}var ts=Date.now();conn.send({t:"msg",text:v,ts:ts});bubble(v,true,ts);tx.value="";tx.style.height="auto";tx.focus()}
+$("sd").onclick=send;
+$("tx").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+$("tx").addEventListener("input",function(){this.style.height="auto";this.style.height=Math.min(120,this.scrollHeight)+"px";var n=Date.now();if(conn&&conn.open&&n-lastTy>1200){lastTy=n;conn.send({t:"typing"})}});
+var E=["❤️","😂","😍","🔥","👍","🥹"];E.forEach(function(e){var b=document.createElement("button");b.textContent=e;b.onclick=function(){$("tx").value+=e;$("tx").focus()};$("em").appendChild(b)});
+$("eb").onclick=function(){$("em").classList.toggle("on")};
+$("nm").addEventListener("keydown",function(e){if(e.key==="Enter")(hm?$("jn"):$("mk")).click()});
+$("cd").addEventListener("keydown",function(e){if(e.key==="Enter")$("jn").click()});
+})();
+</script>
+</body>
+</html>
