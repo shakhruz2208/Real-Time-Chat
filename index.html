@@ -49,14 +49,39 @@ input[type=text],#nm,#cd{font:inherit;font-size:17px;color:var(--fg);background:
 #by{text-align:center;font-size:12.5px;color:var(--dim);padding:0 0 calc(env(safe-area-inset-bottom,0px) + 6px);background:rgba(13,11,30,.6)}
 #homeby{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);text-align:center;font-size:14px;color:var(--dim);pointer-events:none}
 #lb{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center}#lb.on{display:flex}#lb img{max-width:96%;max-height:94%;border-radius:10px}
+#boot,#auth,#otp,#prof{align-items:center;justify-content:center;padding:24px;text-align:center;overflow-y:auto}
+#boot h1,#auth h1,#otp h1,#prof h1{font-size:clamp(40px,10vw,72px);font-weight:800;letter-spacing:-.05em;margin:0 0 6px;background:var(--me);-webkit-background-clip:text;background-clip:text;color:transparent}
+#boot p,#auth p,#otp p{color:var(--dim);margin:0 0 22px;font-size:17px;max-width:34ch;line-height:1.45}
+.fi{font:inherit;font-size:17px;color:var(--fg);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;outline:none;width:100%;color-scheme:dark}.fi:focus{border-color:var(--a)}
+.er{color:#ff7b8d;min-height:1.3em;font-size:15px}
+.av{border-radius:50%;object-fit:cover;display:inline-grid;place-items:center;vertical-align:middle;background:var(--me);color:#0d0b1e;font-weight:800;flex:none}
+#chip{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px 12px;text-align:left}#chip>div:nth-child(2){flex:1;min-width:0}#chip b{font-size:17px}#chip small{color:var(--dim)}
+#hb{color:var(--a);font-weight:800;min-height:1.2em;font-size:17px}
+#pav{cursor:pointer;margin-bottom:6px;display:block}.hint2{font-size:13px;color:var(--dim);margin-bottom:10px}.lbl{font-size:13px;color:var(--dim);text-align:left;margin:4px 4px -6px}
+#resend{background:none;border:0;color:var(--a);font:inherit;font-weight:700;cursor:pointer;padding:8px}#resend:disabled{color:var(--dim);cursor:default}
+#otp6{text-align:center;letter-spacing:.5em;font-size:26px}
+.lnk{background:none;border:0;color:var(--a);font:inherit;font-weight:700;cursor:pointer;padding:6px}
+.by2{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);text-align:center;font-size:14px;color:var(--dim);pointer-events:none}
 </style>
 </head>
 <body>
 <canvas id="fx"></canvas>
-<section id="home" class="scr on">
+<div id="rcv"></div>
+<section id="boot" class="scr on"><div><h1>Two</h1><p id="bootmsg">Loading...</p></div></section>
+<section id="auth" class="scr"><div class="box"><h1>Two</h1><p>Sign in to chat with your friends.</p>
+ <button class="btn" id="gg">Continue with Google</button><div class="or">or use your email</div>
+ <input class="fi" id="em" type="email" autocomplete="email" placeholder="Email"><input class="fi" id="pw" type="password" autocomplete="current-password" placeholder="Password (6+ characters)">
+ <button class="btn" id="si">Sign in</button><button class="btn g" id="su">Create account</button><button class="lnk" id="fg">Forgot password?</button><div class="er" id="aerr"></div></div><div class="by2">Made by Shakhruz</div></section>
+<section id="prof" class="scr"><div class="box"><h1 id="ptitle" style="font-size:clamp(32px,8vw,52px)">Your profile</h1>
+ <label for="ppf" id="pav" aria-label="Choose a profile photo"></label><input id="ppf" type="file" accept="image/*" hidden><div class="hint2">Tap the circle to add a photo</div>
+ <input class="fi" id="pnm" placeholder="Your name" maxlength="20" autocomplete="off">
+ <div class="lbl">Birthday</div><input class="fi" id="pbd" type="date">
+ <div class="lbl">Phone (optional, private)</div><input class="fi" id="pph" type="tel" placeholder="+998 90 123 45 67" maxlength="20">
+ <button class="btn" id="psave">Save</button><button class="btn g" id="pcancel">Cancel</button><div class="er" id="perr"></div></div><div class="by2">Made by Shakhruz</div></section>
+<section id="home" class="scr">
  <h1>Two</h1><p>A private chat for you and your friends. No accounts. No server keeps your messages.</p>
  <div class="box">
-  <input id="nm" placeholder="Your name" maxlength="20" autocomplete="off">
+  <div id="chip"><div id="chipav"></div><div><b id="chipn"></b><br><small id="chipp"></small></div><button class="ib" id="ed">Edit</button><button class="ib" id="so">Sign out</button></div><div id="hb"></div><input id="nm" type="hidden">
   <button class="btn" id="mk">Create a room</button>
   <div class="or">or join with a code</div>
   <input id="cd" placeholder="Room code" maxlength="5" autocomplete="off" style="text-transform:uppercase;letter-spacing:.2em;text-align:center">
@@ -77,7 +102,7 @@ input[type=text],#nm,#cd{font:inherit;font-size:17px;color:var(--fg);background:
 <script>
 (function(){
 var $=function(i){return document.getElementById(i)},R=Math.random,PFX="shkh-two-",MAXP=8,peer=null,conns={},me="",myId="",code="",host=false,left=false,lastTy=0,tyTimer=0,unread=0,reacts={},rxEls={},REAC=["❤️","😂","😍","🔥","👍","🥹"];
-try{$("nm").value=localStorage.getItem("two-name")||""}catch(e){}
+var Me={uid:"",name:"",bday:"",photo:"",phone:""};
 var hm=/room=([A-Za-z0-9]{5})/.exec(location.hash||"");if(hm)$("cd").value=hm[1].toUpperCase();
 // themes
 var TH=[{a:"#6ef2d5",b:"#8f7bff",bg:"#0d0b1e",g1:"rgba(143,123,255,.28)",g2:"rgba(110,242,213,.18)"},{a:"#ffb36b",b:"#ff5d8f",bg:"#1c0b18",g1:"rgba(255,93,143,.28)",g2:"rgba(255,179,107,.2)"},{a:"#9bf26e",b:"#3ecf8e",bg:"#07140f",g1:"rgba(62,207,142,.24)",g2:"rgba(155,242,110,.16)"},{a:"#6ec3ff",b:"#6e7bff",bg:"#060b1c",g1:"rgba(110,123,255,.3)",g2:"rgba(110,195,255,.18)"}],ti=0,HC=[];
@@ -85,9 +110,9 @@ try{ti=+localStorage.getItem("two-th")||0}catch(e){}
 function theme(){var t=TH[ti%TH.length],s=document.documentElement.style;s.setProperty("--a",t.a);s.setProperty("--b",t.b);s.setProperty("--bg",t.bg);s.setProperty("--g1",t.g1);s.setProperty("--g2",t.g2);s.setProperty("--me","linear-gradient(135deg,"+t.a+","+t.b+")");HC=[t.a,t.b,"#ff5d8f","#ffd36b"];try{localStorage.setItem("two-th",ti)}catch(e){}}
 theme();$("th").onclick=function(){ti=(ti+1)%TH.length;theme();hearts(10)};
 // helpers
-function show(id){["home","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
+function show(id){["boot","auth","prof","home","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
 function err(s){$("err").textContent=s}
-function name(){var n=$("nm").value.trim();if(!n){err("Please type your name first.");$("nm").focus();return null}try{localStorage.setItem("two-name",n)}catch(e){}return n}
+function name(){return Me.name||null}
 function gen(){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",s="";for(var i=0;i<5;i++)s+=c[Math.floor(R()*c.length)];return s}
 var ac;function blip(){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;o.frequency.setValueAtTime(880,n);o.frequency.exponentialRampToValueAtTime(1320,n+.08);g.gain.setValueAtTime(.07,n);g.gain.exponentialRampToValueAtTime(.001,n+.18);o.connect(g);g.connect(ac.destination);o.start(n);o.stop(n+.2)}catch(e){}}
 function tm(ts){var d=new Date(ts);return("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
@@ -101,7 +126,7 @@ function note(){if(document.hidden){unread++;document.title="("+unread+") Two"}}
 document.addEventListener("visibilitychange",function(){if(!document.hidden){unread=0;document.title="Two"}});
 // messages
 function row(o){var r=document.createElement("div");r.className="row "+(o.mine?"me":"they");
- if(!o.mine&&Object.keys(conns).length>1){var nm=document.createElement("div");nm.className="nm";nm.textContent=nameOf(o.from);r.appendChild(nm)}
+ if(!o.mine&&Object.keys(conns).length>1){var nm=document.createElement("div");nm.className="nm";nm.appendChild(av(conns[o.from]&&conns[o.from].av,nameOf(o.from),18));nm.appendChild(document.createTextNode(" "+nameOf(o.from)));r.appendChild(nm)}
  var b=document.createElement("div");b.className="m "+(o.mine?"me":"they");
  if(o.kind==="img"){var im=document.createElement("img");im.className="pic";im.src=o.url;im.alt="photo";im.onclick=function(e){e.stopPropagation();$("lb").firstChild.src=o.url;$("lb").classList.add("on")};b.appendChild(im)}
  else if(o.kind==="voice"){var au=document.createElement("audio");au.className="au";au.controls=true;au.src=o.url;b.appendChild(au)}
@@ -146,11 +171,11 @@ var T=document.createElement("button");
 [["❤ Hearts","hearts"],["🎉 Party","e:🎉"],["✨ Sparkle","e:✨"]].forEach(function(p){var b=document.createElement("button");b.className="t";b.textContent=p[0];b.onclick=function(){fx(p[1]);bc({t:"fx",k:p[1]});$("tray").classList.remove("on")};$("tray").appendChild(b)});
 $("eb").onclick=function(){$("tray").classList.toggle("on")};
 // network
-function wire(c){c.on("open",function(){conns[c.peer]={c:c,name:"Friend"};c.send({t:"hi",name:me});if(host)c.send({t:"peers",list:Object.keys(conns).filter(function(k){return k!==c.peer})});hd()});
+function wire(c){c.on("open",function(){conns[c.peer]={c:c,name:"Friend"};c.send({t:"hi",name:me,av:Me.photo||"",bd:isBday(Me.bday)});if(host)c.send({t:"peers",list:Object.keys(conns).filter(function(k){return k!==c.peer})});hd()});
  c.on("data",function(d){onData(c.peer,d)});
  c.on("close",function(){var e=conns[c.peer];delete conns[c.peer];if(e&&!left){sys(e.name+" left.");hd()}});c.on("error",function(){})}
 function onData(id,d){if(!d||!d.t||!conns[id])return;
- if(d.t==="hi"){conns[id].name=String(d.name||"Friend").slice(0,20);sys(conns[id].name+" joined.");blip();hd()}
+ if(d.t==="hi"){conns[id].name=String(d.name||"Friend").slice(0,20);conns[id].av=(typeof d.av==="string"&&d.av.indexOf("data:image/")===0&&d.av.length<60000)?d.av:"";sys(conns[id].name+" joined.");if(d.bd){sys("Today is "+conns[id].name+"'s birthday!");hearts(30)}blip();hd()}
  else if(d.t==="peers"){(d.list||[]).forEach(function(p){if(p!==myId&&!conns[p]&&String(p).indexOf(PFX)===0)wire(peer.connect(p,{reliable:true}))})}
  else if(d.t==="msg"){note();row({mid:d.mid,from:id,kind:"t",text:String(d.text).slice(0,2000),ts:d.ts});blip();$("ty").textContent=""}
  else if(d.t==="img"||d.t==="voice"){note();row({mid:d.mid,from:id,kind:d.t,url:URL.createObjectURL(new Blob([d.data],{type:d.mime})),ts:d.ts});blip()}
@@ -167,6 +192,29 @@ function startGuest(n,c){me=n;host=false;code=c;myId=PFX+code+"-"+gen();peer=new
  peer.on("open",function(){var cn=peer.connect(PFX+code,{reliable:true});cn.on("open",function(){clearTimeout(to);show("chat");hd()});wire(cn)});
  peer.on("error",function(e){if(e.type==="peer-unavailable"&&Object.keys(conns).length===0){clearTimeout(to);err("Room not found. Check the code.");leave(true)}})}
 function leave(quiet){left=true;Object.keys(conns).forEach(function(k){try{conns[k].c.close()}catch(e){}});try{if(peer)peer.destroy()}catch(e){}conns={};peer=null;reacts={};rxEls={};$("msgs").innerHTML="";$("ty").textContent="";left=false;show("home");if(!quiet)err("")}
+function isBday(b){if(!b)return false;var d=new Date();return b.slice(5)===("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function av(src,nm,sz){var e;if(src){e=document.createElement("img");e.src=src;e.alt=""}else{e=document.createElement("span");e.textContent=(nm||"?").trim().charAt(0).toUpperCase()}e.className="av";e.style.width=e.style.height=sz+"px";e.style.fontSize=Math.round(sz*.5)+"px";return e}
+function ferr(e){var c=e&&e.code||"",m={"auth/invalid-credential":"Wrong email or password.","auth/wrong-password":"Wrong email or password.","auth/user-not-found":"No account with this email. Tap Create account.","auth/email-already-in-use":"This email already has an account. Tap Sign in.","auth/weak-password":"Password must be at least 6 characters.","auth/invalid-email":"Please check the email address.","auth/missing-password":"Enter your password.","auth/too-many-requests":"Too many tries. Please wait a few minutes.","auth/network-request-failed":"No internet connection.","auth/popup-closed-by-user":"","auth/cancelled-popup-request":"","auth/popup-blocked":"Your browser blocked the Google window. Allow pop-ups and try again.","auth/unauthorized-domain":"This website is not allowed yet. Add its domain in Firebase > Authentication > Settings > Authorized domains."};return c in m?m[c]:((e&&e.message)||"Something went wrong.")}
+function renderChip(){var a=$("chipav");a.innerHTML="";a.appendChild(av(Me.photo,Me.name,44));$("chipn").textContent=Me.name;$("chipp").textContent=Me.email||""}
+var newUser=false,pphoto="";
+function drawPav(){var a=$("pav");a.innerHTML="";a.appendChild(av(pphoto,$("pnm").value||"?",110))}
+function openProf(p,isNew){newUser=isNew;pphoto=p.photo||"";$("pnm").value=p.name||"";$("pbd").value=p.bday||"";$("pph").value=p.phone||"";$("perr").textContent="";drawPav();$("ptitle").textContent=isNew?"Create your profile":"Your profile";$("pcancel").textContent=isNew?"Sign out":"Cancel";show("prof")}
+$("pnm").addEventListener("input",function(){if(!pphoto)drawPav()});
+$("ppf").onchange=function(){var f=this.files[0];this.value="";if(!f)return;var im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),cv=document.createElement("canvas");cv.width=cv.height=160;cv.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);pphoto=cv.toDataURL("image/jpeg",.8);drawPav()};im.src=URL.createObjectURL(f)};
+$("psave").onclick=function(){var n=$("pnm").value.trim();if(!n){$("perr").textContent="Please type your name.";return}$("psave").disabled=true;Fb.save({name:n.slice(0,20),bday:$("pbd").value,photo:pphoto,phone:$("pph").value.trim().slice(0,20)}).then(function(p){$("psave").disabled=false;App.login(p)}).catch(function(e){$("psave").disabled=false;$("perr").textContent=ferr(e)})};
+$("pcancel").onclick=function(){if(newUser)Fb.out();else show("home")};
+$("so").onclick=function(){Fb.out()};$("ed").onclick=function(){openProf(Me,false)};
+function authErr(m){$("aerr").textContent=m}
+function busy(b){["gg","si","su"].forEach(function(i){$(i).disabled=b})}
+function run(p){authErr("");busy(true);p.then(function(){busy(false)}).catch(function(e){busy(false);authErr(ferr(e))})}
+$("gg").onclick=function(){run(Fb.google())};
+function cred(){var e=$("em").value.trim(),p=$("pw").value;if(!e||!p){authErr("Enter your email and password.");return null}return [e,p]}
+$("si").onclick=function(){var c=cred();if(c)run(Fb.signIn(c[0],c[1]))};
+$("su").onclick=function(){var c=cred();if(c)run(Fb.signUp(c[0],c[1]))};
+$("fg").onclick=function(){var e=$("em").value.trim();if(!e){authErr("Type your email first, then tap Forgot password.");return}Fb.reset(e).then(function(){authErr("Password reset email sent. Check your inbox.")}).catch(function(x){authErr(ferr(x))})};
+$("pw").addEventListener("keydown",function(e){if(e.key==="Enter")$("si").click()});
+window.App={show:show,boot:function(m){$("bootmsg").textContent=m;show("boot")},setup:function(p){Me=p;openProf(p,true)},login:function(p){Me=p;$("nm").value=p.name;renderChip();show("home");if(isBday(p.bday)){$("hb").textContent="Happy birthday, "+p.name+"!";hearts(30)}else $("hb").textContent=""}};
+
 $("mk").onclick=function(){err("");var n=name();if(n)startHost(n)};
 $("jn").onclick=function(){err("");var n=name();if(!n)return;var c=$("cd").value.trim().toUpperCase();if(c.length!==5){err("The room code has 5 characters.");return}startGuest(n,c)};
 $("lv").onclick=function(){leave()};
@@ -176,6 +224,23 @@ $("tx").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){
 $("tx").addEventListener("input",function(){this.style.height="auto";this.style.height=Math.min(120,this.scrollHeight)+"px";var n=Date.now();if(n-lastTy>1200){bc({t:"typing"});lastTy=n}});
 $("nm").addEventListener("keydown",function(e){if(e.key==="Enter")(hm?$("jn"):$("mk")).click()});$("cd").addEventListener("keydown",function(e){if(e.key==="Enter")$("jn").click()});
 })();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const FIREBASE_CONFIG={apiKey:"AIzaSyAOT-e_lhyAk65i06EBDrTFn9wE0LGOzGY",authDomain:"real-time-chat-9ffa3.firebaseapp.com",projectId:"real-time-chat-9ffa3",storageBucket:"real-time-chat-9ffa3.firebasestorage.app",messagingSenderId:"25955240773",appId:"1:25955240773:web:7c5a0bea4a9c90d1b70c2c"};
+const app=initializeApp(FIREBASE_CONFIG),auth=getAuth(app),db=getFirestore(app);
+window.Fb={
+ google(){return signInWithPopup(auth,new GoogleAuthProvider())},
+ signIn(e,p){return signInWithEmailAndPassword(auth,e,p)},
+ signUp(e,p){return createUserWithEmailAndPassword(auth,e,p)},
+ reset(e){return sendPasswordResetEmail(auth,e)},
+ async save(p){const u=auth.currentUser,data={name:p.name,bday:p.bday||"",photo:p.photo||"",phone:p.phone||"",updated:Date.now()};await setDoc(doc(db,"users",u.uid),data,{merge:true});return {uid:u.uid,email:u.email,...data}},
+ out(){return signOut(auth)}};
+onAuthStateChanged(auth,async u=>{if(!u){App.show("auth");return}
+ try{const s=await getDoc(doc(db,"users",u.uid));if(s.exists())App.login({uid:u.uid,email:u.email,...s.data()});else App.setup({uid:u.uid,email:u.email,name:(u.displayName||"").slice(0,20)})}
+ catch(e){App.boot("Could not load your profile: "+e.message)}});
 </script>
 </body>
 </html>
